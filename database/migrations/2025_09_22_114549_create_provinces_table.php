@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name_th')->comment('ชื่อจังหวัดภาษาไทย');
             $table->string('name_en')->comment('ชื่อจังหวัดภาษาอังกฤษ');
-            $table->enum('region', ['north', 'northeast', 'central', 'east', 'south_west', 'south_east'])->comment('ภูมิภาค');
+            $table->enum('region', ['north', 'west', 'central', 'east', 'north_east', 'south'])->comment('ภูมิภาค');
             $table->string('code', 2)->unique()->comment('รหัสจังหวัด 2 หลัก เช่น 10 = กรุงเทพ');
             $table->decimal('latitude', 10, 8)->nullable()->comment('พิกัดศูนย์กลางจังหวัด');
             $table->decimal('longitude', 11, 8)->nullable()->comment('พิกัดศูนย์กลางจังหวัด');

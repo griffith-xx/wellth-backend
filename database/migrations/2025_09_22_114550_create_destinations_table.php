@@ -44,16 +44,16 @@ return new class extends Migration
             $table->enum('price_range', ['budget', 'mid_range', 'luxury', 'premium']);
 
             // จับคู่กับ trip_duration - สถานที่เหมาะกับระยะเวลาไหน
-            $table->json('suitable_trip_duration')->nullable()->comment('["1-2_days", "3-4_days", "5-7_days", "more_than_week"]');
+            $table->enum('suitable_trip_duration', ['1-2_days', '3-4_days', '5-7_days', 'more_than_week'])->nullable();
 
             // จับคู่กับ travel_style
-            $table->json('suitable_travel_style')->nullable()->comment('["solo", "couple", "family", "group"]');
+            $table->enum('suitable_travel_style', ['solo', 'couple', 'family', 'group'])->nullable();
 
             // จับคู่กับ nature_preferences
             $table->json('nature_types')->nullable()->comment('["mountain", "beach", "forest", "waterfall", "flower_field", "hot_spring", "national_park"]');
 
             // จับคู่กับ preferred_climate
-            $table->enum('climate_type', ['cool', 'warm', 'tropical_hot', 'sea_breeze'])->nullable();
+            $table->enum('climate_type', ['cool', 'warm', 'tropical_hot', 'sea_breeze', 'no_preference'])->nullable();
 
             // จับคู่กับ preferred_months
             $table->json('best_months')->nullable()->comment('["jan_feb", "mar_may", "jun_aug", "sep_oct", "nov_dec", "flexible"]');
@@ -71,13 +71,13 @@ return new class extends Migration
             $table->json('languages_supported')->nullable()->comment('["thai", "english", "chinese", "japanese", "korean"]');
 
             // จับคู่กับ medical_support_needed
-            $table->boolean('medical_support_available')->default(false);
+            $table->enum('medical_support_available', ['required', 'not_required'])->default('not_required');
 
             // จับคู่กับ social_interaction_level
             $table->json('social_environment')->nullable()->comment('["privacy_quiet", "minimal_interaction", "meet_new_people"]');
 
             // คะแนนและความนิยม
-            $table->decimal('expert_rating', 3, 2)->default(4.0)->comment('คะแนนจากผู้เชี่ยวชาญ');
+            $table->decimal('expert_rating', 3, 2)->default(0.0)->comment('คะแนนจากผู้เชี่ยวชาญ');
             $table->integer('popularity_score')->default(0)->comment('คะแนนความนิยม');
 
             // ข้อมูลเพิ่มเติม

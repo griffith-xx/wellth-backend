@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\ProvinceController;
-use App\Models\Destination;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,5 +16,5 @@ Route::middleware([
 ])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('/provinces', ProvinceController::class);
-    Route::resource('/destinations', Destination::class);
+    Route::resource('/destinations', DestinationController::class);
 });

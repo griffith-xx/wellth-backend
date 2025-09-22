@@ -17,7 +17,7 @@ class ProvinceSeeder extends Seeder
             [
                 'name_th' => 'ขอนแก่น',
                 'name_en' => 'Khon Kaen',
-                'region' => 'northeast',
+                'region' => 'north_east',
                 'code' => '40',
                 'latitude' => 16.4419,
                 'longitude' => 102.8359,
@@ -47,7 +47,7 @@ class ProvinceSeeder extends Seeder
             [
                 'name_th' => 'อุดรธานี',
                 'name_en' => 'Udon Thani',
-                'region' => 'northeast',
+                'region' => 'north_east',
                 'code' => '41',
                 'latitude' => 17.4138,
                 'longitude' => 102.7870,
@@ -77,7 +77,7 @@ class ProvinceSeeder extends Seeder
             [
                 'name_th' => 'หนองคาย',
                 'name_en' => 'Nong Khai',
-                'region' => 'northeast',
+                'region' => 'north_east',
                 'code' => '43',
                 'latitude' => 17.8782,
                 'longitude' => 102.7412,

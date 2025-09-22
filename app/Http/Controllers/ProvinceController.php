@@ -25,7 +25,7 @@ class ProvinceController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Provinces/Create');
     }
 
     /**
@@ -33,7 +33,19 @@ class ProvinceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'name_th' => ['required', 'string', 'max:255'],
+            'name_en' => ['required', 'string', 'max:255'],
+            'region' => ['required', 'string', 'in:north,central,south,east,west'],
+            'code' => ['required', 'string', 'unique:provinces', 'size:2'],
+        ]);
+
+        Province::create($validate);
+
+        return redirect()->route('provinces.index')->with('flash', [
+            'message' => 'Province created successfully.',
+            'style' => 'success',
+        ]);
     }
 
     /**

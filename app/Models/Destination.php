@@ -45,31 +45,38 @@ class Destination extends Model
         'is_active',
     ];
 
-    protected $casts = [
-        'gallery_images' => 'array',
-        'suitable_health_goals' => 'array',
-        'suitable_health_conditions' => 'array',
-        'spa_treatments_available' => 'array',
-        'traditional_healing_available' => 'array',
-        'fitness_programs_available' => 'array',
-        'accommodation_types' => 'array',
-        'suitable_trip_duration' => 'array',
-        'suitable_travel_style' => 'array',
-        'nature_types' => 'array',
-        'best_months' => 'array',
-        'dietary_options_available' => 'array',
-        'food_restrictions_supported' => 'array',
-        'accessibility_features' => 'array',
-        'languages_supported' => 'array',
-        'social_environment' => 'array',
-        'operating_hours' => 'array',
-        'medical_support_available' => 'boolean',
-        'is_active' => 'boolean',
-        'expert_rating' => 'decimal:2',
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
-        'popularity_score' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            // JSON fields
+            'gallery_images' => 'array',
+            'suitable_health_goals' => 'array',
+            'suitable_health_conditions' => 'array',
+            'spa_treatments_available' => 'array',
+            'traditional_healing_available' => 'array',
+            'fitness_programs_available' => 'array',
+            'accommodation_types' => 'array',
+            'nature_types' => 'array',
+            'best_months' => 'array',
+            'dietary_options_available' => 'array',
+            'food_restrictions_supported' => 'array',
+            'accessibility_features' => 'array',
+            'languages_supported' => 'array',
+            'social_environment' => 'array',
+            'operating_hours' => 'array',
+            
+            // Decimal fields
+            'expert_rating' => 'decimal:2',
+            'latitude' => 'decimal:8',
+            'longitude' => 'decimal:8',
+            
+            // Integer fields
+            'popularity_score' => 'integer',
+            
+            // Boolean fields
+            'is_active' => 'boolean',
+        ];
+    }
 
     /**
      * Get the province that owns the destination
@@ -279,6 +286,13 @@ class Destination extends Model
             $totalCriteria += 20;
         }
 
+        // Health conditions matching
+        if (!empty($userPreferences['health_conditions']) && !empty($this->suitable_health_conditions)) {
+            $matches = array_intersect($userPreferences['health_conditions'], $this->suitable_health_conditions);
+            $score += (count($matches) / count($userPreferences['health_conditions'])) * 15;
+            $totalCriteria += 15;
+        }
+
         // Activity level matching
         if (!empty($userPreferences['physical_activity_level']) && $this->activity_level) {
             if ($userPreferences['physical_activity_level'] === $this->activity_level) {
@@ -307,9 +321,9 @@ class Destination extends Model
         if (!empty($userPreferences['nature_preferences']) && !empty($this->nature_types)) {
             $matches = array_intersect($userPreferences['nature_preferences'], $this->nature_types);
             if (!empty($matches)) {
-                $score += (count($matches) / count($userPreferences['nature_preferences'])) * 15;
+                $score += (count($matches) / count($userPreferences['nature_preferences'])) * 10;
             }
-            $totalCriteria += 15;
+            $totalCriteria += 10;
         }
 
         // Spa treatments matching
@@ -321,18 +335,78 @@ class Destination extends Model
             $totalCriteria += 10;
         }
 
-        // Travel style matching
-        if (!empty($userPreferences['travel_style']) && !empty($this->suitable_travel_style)) {
-            if (in_array($userPreferences['travel_style'], $this->suitable_travel_style)) {
-                $score += 10;
+        // Traditional healing matching
+        if (!empty($userPreferences['traditional_healing']) && !empty($this->traditional_healing_available)) {
+            $matches = array_intersect($userPreferences['traditional_healing'], $this->traditional_healing_available);
+            if (!empty($matches)) {
+                $score += (count($matches) / count($userPreferences['traditional_healing'])) * 8;
             }
-            $totalCriteria += 10;
+            $totalCriteria += 8;
+        }
+
+        // Fitness programs matching
+        if (!empty($userPreferences['fitness_programs']) && !empty($this->fitness_programs_available)) {
+            $matches = array_intersect($userPreferences['fitness_programs'], $this->fitness_programs_available);
+            if (!empty($matches)) {
+                $score += (count($matches) / count($userPreferences['fitness_programs'])) * 8;
+            }
+            $totalCriteria += 8;
+        }
+
+        // Travel style matching - แก้ไขตรงนี้
+        if (!empty($userPreferences['travel_style']) && $this->suitable_travel_style) {
+            if ($userPreferences['travel_style'] === $this->suitable_travel_style) {
+                $score += 8;
+            }
+            $totalCriteria += 8;
+        }
+
+        // Trip duration matching
+        if (!empty($userPreferences['trip_duration']) && $this->suitable_trip_duration) {
+            if ($userPreferences['trip_duration'] === $this->suitable_trip_duration) {
+                $score += 5;
+            }
+            $totalCriteria += 5;
+        }
+
+        // Accommodation type matching - แก้ไขตรงนี้
+        if (!empty($userPreferences['accommodation_type']) && !empty($this->accommodation_types)) {
+            if (in_array($userPreferences['accommodation_type'], $this->accommodation_types)) {
+                $score += 5;
+            }
+            $totalCriteria += 5;
+        }
+
+        // Dietary preferences matching
+        if (!empty($userPreferences['dietary_preferences']) && !empty($this->dietary_options_available)) {
+            $matches = array_intersect($userPreferences['dietary_preferences'], $this->dietary_options_available);
+            if (!empty($matches)) {
+                $score += (count($matches) / count($userPreferences['dietary_preferences'])) * 5;
+            }
+            $totalCriteria += 5;
+        }
+
+        // Language preference matching
+        if (!empty($userPreferences['language_preference']) && !empty($this->languages_supported)) {
+            if (in_array($userPreferences['language_preference'], $this->languages_supported)) {
+                $score += 3;
+            }
+            $totalCriteria += 3;
         }
 
         // Medical support matching
-        if (!empty($userPreferences['medical_support_needed']) && $userPreferences['medical_support_needed'] === 'yes') {
-            if ($this->medical_support_available) {
+        if (!empty($userPreferences['medical_support_needed']) && $userPreferences['medical_support_needed'] !== 'not_required') {
+            if ($this->medical_support_available === 'required') {
                 $score += 5;
+            }
+            $totalCriteria += 5;
+        }
+
+        // Accessibility matching
+        if (!empty($userPreferences['mobility_requirements']) && !empty($this->accessibility_features)) {
+            $matches = array_intersect($userPreferences['mobility_requirements'], $this->accessibility_features);
+            if (!empty($matches)) {
+                $score += (count($matches) / count($userPreferences['mobility_requirements'])) * 5;
             }
             $totalCriteria += 5;
         }
